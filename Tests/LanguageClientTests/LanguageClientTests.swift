@@ -176,6 +176,10 @@ class TestDelegate: LanguageClientNotificationDelegate {
     self.expectation = expectation
   }
   
+  func receive(message: LogMessage) -> Bool {
+    return true
+  }
+
   func receive(diagnostics: [Diagnostic]) {
     self.diagnostics = diagnostics
     expectation.fulfill()
