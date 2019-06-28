@@ -164,7 +164,9 @@ public class JSONRPCChannel: JSONRPCMessageSender {
   public func shutdownChannel() -> Promise<Bool> {
     return Promise { resolver in
       backgroundQueue.async { [weak self] in
-        self?.process.terminate()
+        if self?.process.isRunning == true {
+          self?.process.terminate()
+        }
         self?.processInput.fileHandleForWriting.closeFile()
         self?.processOutput.fileHandleForReading.closeFile()
         resolver.fulfill(true)
@@ -228,7 +230,7 @@ public class JSONRPCChannel: JSONRPCMessageSender {
   /// Writes data to the channel.
   ///
   func write(data: Data) {
-    guard !data.isEmpty else { return }
+    guard !data.isEmpty, writeIO != nil else { return }
     
     var dispatchData = DispatchData.empty
     data.withUnsafeBytes { dispatchData.append($0) }
